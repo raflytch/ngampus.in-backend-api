@@ -45,6 +45,9 @@ lerna-debug.log*
 # Prisma Migrations
 /prisma/migrations
 
+# Generated prisma
+/generated/prisma
+
 # temp directory
 .temp
 .tmp
