@@ -20,7 +20,6 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateAvatarResponseDto } from './dto/update-avatar.dto';
-import { User } from './interfaces/user.interface';
 
 @Controller('/api/v1/auth')
 export class AuthController {

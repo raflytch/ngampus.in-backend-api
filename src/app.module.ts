@@ -6,6 +6,7 @@ import { PrismaModule } from './common/prisma/prisma.module';
 import { ImagekitModule } from './common/imagekit/imagekit.module';
 import { FiltersModule } from './common/filters/filters.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     ImagekitModule,
     FiltersModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
