@@ -24,4 +24,8 @@ export class ConfigService {
   get imagekitUrlEndpoint(): string {
     return this.configService.get<string>('IMAGEKIT_URL_ENDPOINT') || '';
   }
+
+  get jwtSecret(): string {
+    return this.configService.get<string>('JWT_SECRET') || 'secret';
+  }
 }

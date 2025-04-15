@@ -21,6 +21,7 @@ model User {
   password  String
   fakultas  String
   avatar    String?
+  role      Role      @default(USER)
   posts     Post[]
   comments  Comment[]
   likes     Like[]
@@ -67,4 +68,9 @@ enum Kategori {
   TUGAS
   CURHAT
   MEME
+}
+
+enum Role {
+  USER
+  ADMIN
 }
