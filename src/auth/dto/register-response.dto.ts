@@ -1,10 +1,12 @@
+import { Role } from 'generated/prisma';
+
 export class RegisterResponseDto {
   user: {
     id: string;
     name: string;
     email: string;
     fakultas: string;
-    avatar?: string;
-    role: string;
+    avatar: string;
+    role: Role;
   };
 }

@@ -13,6 +13,8 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { ImagekitService } from '../common/imagekit/imagekit.service';
 import { UpdateAvatarResponseDto } from './dto/update-avatar.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { User } from './interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +46,15 @@ export class AuthService {
       },
     });
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      fakultas: user.fakultas,
+      avatar: user.avatar || '',
+      role: user.role,
+      createdAt: user.createdAt.toISOString(),
+    };
 
     return {
       user: {
@@ -75,7 +85,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      fakultas: user.fakultas,
+      avatar: user.avatar || '',
+      role: user.role,
+      createdAt: user.createdAt.toISOString(),
+    };
 
     return {
       user: {
@@ -119,7 +137,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(userId: string): Promise<any> {
+  async validateUser(userId: string): Promise<Omit<User, 'password'>> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -130,5 +148,25 @@ export class AuthService {
 
     const { password, ...result } = user;
     return result;
+  }
+
+  getProfileFromToken(token: string): AuthResponseDto {
+    try {
+      const decoded = this.jwtService.verify(token);
+
+      return {
+        user: {
+          id: decoded.sub,
+          name: decoded.name,
+          email: decoded.email,
+          fakultas: decoded.fakultas,
+          avatar: decoded.avatar,
+          role: decoded.role,
+        },
+        access_token: token,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

@@ -1,10 +1,11 @@
 import { Role } from 'generated/prisma';
 
-export class UpdateAvatarResponseDto {
+export interface User {
   id: string;
   name: string;
   email: string;
   fakultas: string;
-  avatar: string;
+  avatar?: string | null;
   role: Role;
+  createdAt: Date;
 }
