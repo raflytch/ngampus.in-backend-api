@@ -10,6 +10,7 @@ import { ConfigService } from '../common/config/config.service';
 import { ImagekitModule } from '../common/imagekit/imagekit.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { EmailModule } from '../common/email/email.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { memoryStorage } from 'multer';
     PrismaModule,
     ConfigModule,
     ImagekitModule,
+    EmailModule,
     MulterModule.register({
       storage: memoryStorage(),
     }),

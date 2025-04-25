@@ -28,4 +28,12 @@ export class ConfigService {
   get jwtSecret(): string {
     return this.configService.get<string>('JWT_SECRET') || 'secret';
   }
+
+  get emailUser(): string {
+    return this.configService.get<string>('EMAIL_USER') || '';
+  }
+
+  get emailPassword(): string {
+    return this.configService.get<string>('EMAIL_PASS') || '';
+  }
 }
