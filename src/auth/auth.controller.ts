@@ -112,10 +112,10 @@ export class AuthController {
     return this.authService.requestAccountDeletion(requestDto);
   }
 
-  @Post('account/confirm-deletion')
+  @Delete('account')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async confirmAccountDeletion(
+  async deleteAccount(
     @GetUser('id') userId: string,
     @Body('otp') otp: string,
   ): Promise<DeleteAccountResponseDto> {
