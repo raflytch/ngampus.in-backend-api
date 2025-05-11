@@ -81,8 +81,8 @@ export class PostService {
     paginationDto: PaginationDto,
     userId?: string,
   ): Promise<PaginatedResponseDto<PostResponseDto>> {
-    const page = paginationDto.page || 1;
-    const limit = paginationDto.limit || 10;
+    const page = Number(paginationDto.page) || 1;
+    const limit = Number(paginationDto.limit) || 10;
     const skip = (page - 1) * limit;
 
     const [posts, totalItems] = await Promise.all([
