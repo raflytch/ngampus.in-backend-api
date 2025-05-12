@@ -57,7 +57,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req): AuthResponseDto {
+  async getProfile(@Request() req): Promise<AuthResponseDto> {
     const token = req.headers.authorization.split(' ')[1];
     return this.authService.getProfileFromToken(token);
   }

@@ -159,20 +159,41 @@ export class AuthService {
     return result;
   }
 
-  getProfileFromToken(token: string): AuthResponseDto {
+  async getProfileFromToken(token: string): Promise<AuthResponseDto> {
     try {
       const decoded = this.jwtService.verify(token);
+      const userId = decoded.sub;
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const payload: JwtPayload = {
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        fakultas: user.fakultas,
+        avatar: user.avatar || '',
+        role: user.role,
+        createdAt: user.createdAt.toISOString(),
+      };
+
+      const newToken = this.jwtService.sign(payload);
 
       return {
         user: {
-          id: decoded.sub,
-          name: decoded.name,
-          email: decoded.email,
-          fakultas: decoded.fakultas,
-          avatar: decoded.avatar,
-          role: decoded.role,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          fakultas: user.fakultas,
+          avatar: user.avatar || '',
+          role: user.role,
         },
-        access_token: token,
+        access_token: newToken,
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
