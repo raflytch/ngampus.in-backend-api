@@ -8,6 +8,4 @@ export interface JwtPayload {
   avatar: string;
   role: Role;
   createdAt: string;
-  iat?: number;
-  exp?: number;
 }

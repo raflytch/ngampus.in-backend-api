@@ -1,30 +1,29 @@
 import {
-  Body,
   Controller,
   Post,
-  HttpCode,
-  HttpStatus,
+  Body,
   UseGuards,
+  Request,
   Get,
+  Patch,
   UseInterceptors,
   UploadedFile,
-  Patch,
-  Request,
+  HttpCode,
+  HttpStatus,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GetUser } from './decorators/get-user.decorator';
-import { AuthResponseDto } from './dto/auth-response.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 import { UpdateAvatarResponseDto } from './dto/update-avatar.dto';
-import {
-  UpdateProfileDto,
-  UpdateProfileResponseDto,
-} from './dto/update-profile.dto';
+import { UpdateProfileResponseDto } from './dto/update-profile.dto';
 import {
   RequestPasswordResetDto,
   VerifyOtpDto,
@@ -33,9 +32,11 @@ import {
 } from './dto/password-reset.dto';
 import {
   RequestAccountDeletionDto,
-  ConfirmAccountDeletionDto,
   DeleteAccountResponseDto,
 } from './dto/delete-account.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
+import { GoogleAuthUrlResponseDto } from './dto/google-auth.dto';
 
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -119,7 +120,23 @@ export class AuthController {
     @GetUser('id') userId: string,
     @Body('otp') otp: string,
   ): Promise<DeleteAccountResponseDto> {
-    const confirmDto: ConfirmAccountDeletionDto = { userId, otp };
-    return this.authService.confirmAccountDeletion(confirmDto);
+    return this.authService.confirmAccountDeletion({ userId, otp });
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Request() req, @Res() res: Response) {
+    const authResponse = await this.authService.validateGoogleUser(req.user);
+    const redirectUrl = `http://localhost:5173/post?token=${authResponse.access_token}`;
+    return res.redirect(redirectUrl);
+  }
+
+  @Get('google/failure')
+  googleAuthFailure(): GoogleAuthUrlResponseDto {
+    return { url: 'http://localhost:5173/login?error=google-auth-failed' };
   }
 }

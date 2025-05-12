@@ -36,4 +36,12 @@ export class ConfigService {
   get emailPassword(): string {
     return this.configService.get<string>('EMAIL_PASS') || '';
   }
+
+  get googleClientId(): string {
+    return this.configService.get<string>('GOOGLE_CLIENT_ID') || '';
+  }
+
+  get googleClientSecret(): string {
+    return this.configService.get<string>('GOOGLE_CLIENT_SECRET') || '';
+  }
 }

@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { PrismaModule } from '../common/prisma/prisma.module';
 import { ConfigModule } from '../common/config/config.module';
 import { ConfigService } from '../common/config/config.service';
@@ -14,7 +15,7 @@ import { EmailModule } from '../common/email/email.module';
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     PrismaModule,
     ConfigModule,
     ImagekitModule,
@@ -32,7 +33,7 @@ import { EmailModule } from '../common/email/email.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, GoogleStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

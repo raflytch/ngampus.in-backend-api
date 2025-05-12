@@ -32,6 +32,7 @@ import {
   ConfirmAccountDeletionDto,
   DeleteAccountResponseDto,
 } from './dto/delete-account.dto';
+import { GoogleUserDto } from './dto/google-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -224,7 +225,7 @@ export class AuthService {
   }
 
   private getOtpExpiry(): Date {
-    return new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+    return new Date(Date.now() + 15 * 60 * 1000);
   }
 
   async requestPasswordReset(
@@ -370,5 +371,58 @@ export class AuthService {
     });
 
     return { message: 'Account deleted successfully' };
+  }
+
+  async validateGoogleUser(
+    googleUser: GoogleUserDto,
+  ): Promise<AuthResponseDto> {
+    const { email, firstName, lastName, picture } = googleUser;
+
+    if (!email) {
+      throw new BadRequestException(
+        'Email is required from Google authentication',
+      );
+    }
+
+    let user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          name: `${firstName} ${lastName}`,
+          password: hashedPassword,
+          fakultas: 'Not specified',
+          avatar: picture,
+        },
+      });
+    }
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      fakultas: user.fakultas,
+      avatar: user.avatar || '',
+      role: user.role,
+      createdAt: user.createdAt.toISOString(),
+    };
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        fakultas: user.fakultas,
+        avatar: user.avatar || '',
+        role: user.role,
+      },
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
