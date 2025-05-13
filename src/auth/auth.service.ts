@@ -166,6 +166,28 @@ export class AuthService {
 
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
+        include: {
+          posts: {
+            include: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                  fakultas: true,
+                  avatar: true,
+                  role: true,
+                },
+              },
+              _count: {
+                select: {
+                  likes: true,
+                  comments: true,
+                },
+              },
+            },
+            orderBy: { createdAt: 'desc' },
+          },
+        },
       });
 
       if (!user) {
@@ -184,6 +206,15 @@ export class AuthService {
 
       const newToken = this.jwtService.sign(payload);
 
+      const postsWithCounts = user.posts.map((post) => {
+        const { _count, ...postWithoutCount } = post;
+        return {
+          ...postWithoutCount,
+          likesCount: _count.likes,
+          commentsCount: _count.comments,
+        };
+      });
+
       return {
         user: {
           id: user.id,
@@ -193,6 +224,7 @@ export class AuthService {
           avatar: user.avatar || '',
           role: user.role,
         },
+        posts: postsWithCounts,
         access_token: newToken,
       };
     } catch (error) {
