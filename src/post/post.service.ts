@@ -338,8 +338,18 @@ export class PostService {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
-    await this.prisma.post.delete({
-      where: { id },
+    await this.prisma.$transaction(async (tx) => {
+      await tx.comment.deleteMany({
+        where: { postId: id },
+      });
+
+      await tx.like.deleteMany({
+        where: { postId: id },
+      });
+
+      await tx.post.delete({
+        where: { id },
+      });
     });
 
     return { message: 'Post deleted successfully' };
