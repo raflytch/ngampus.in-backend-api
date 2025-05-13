@@ -42,13 +42,18 @@ export class PostService {
       imageUrl = uploadResult.url;
     }
 
+    const isAnonymous =
+      typeof createPostDto.isAnonymous === 'string'
+        ? createPostDto.isAnonymous === 'true'
+        : !!createPostDto.isAnonymous;
+
     const post = await this.prisma.post.create({
       data: {
         title: createPostDto.title,
         content: createPostDto.content,
         image: imageUrl,
         kategori: createPostDto.kategori,
-        isAnonymous: createPostDto.isAnonymous || false,
+        isAnonymous: isAnonymous,
         fakultas: createPostDto.fakultas || userWithFakultas.fakultas,
         authorId: userId,
       },
@@ -231,9 +236,20 @@ export class PostService {
       throw new ForbiddenException('You can only update your own posts');
     }
 
+    const isAnonymous =
+      typeof updatePostDto.isAnonymous === 'string'
+        ? updatePostDto.isAnonymous === 'true'
+        : updatePostDto.isAnonymous;
+
+    const updatedPostData = {
+      ...updatePostDto,
+      isAnonymous:
+        updatePostDto.isAnonymous !== undefined ? isAnonymous : undefined,
+    };
+
     const updatedPost = await this.prisma.post.update({
       where: { id },
-      data: updatePostDto,
+      data: updatedPostData,
       include: {
         author: {
           select: {
